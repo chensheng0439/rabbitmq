@@ -10,7 +10,7 @@ public class RabbitConsumer {
 
     private static final String QUEUE_NAME = "queue_demo";
 
-    private static final String IP_ADDRESS = "192.168.71.128";
+    private static final String IP_ADDRESS = "192.168.10.6";
 
     private static final Integer PORT = 5672;
 
