@@ -1,14 +1,14 @@
 package com.schen.demo;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.MessageProperties;
+import com.rabbitmq.client.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitProducer {
@@ -51,7 +51,22 @@ public class RabbitProducer {
         channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,ROUTING_KEY);
         String message = "Hello World";
         // 发送消息
-        channel.basicPublish(EXCHANGE_NAME,ROUTING_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,message.getBytes());
+       //  channel.basicPublish(EXCHANGE_NAME,ROUTING_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,message.getBytes());
+        // 设置headers
+        Map<String,Object> headers = new HashMap<>();
+        headers.put("location","here");
+        headers.put("time","today");
+        // 自定义消息属性
+        channel.basicPublish(EXCHANGE_NAME,ROUTING_KEY,new AMQP.BasicProperties.Builder()
+                        .contentType("text/plain")
+                        .deliveryMode(2)
+                        .priority(1)
+                        // 设置headers
+                        .headers(headers)
+                        // 设置过期时间
+                        .expiration("60000")
+                        .userId("hidden").build()
+                ,message.getBytes());
         channel.close();
         connection.close();
     }
