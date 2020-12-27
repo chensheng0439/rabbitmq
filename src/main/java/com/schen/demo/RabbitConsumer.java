@@ -10,7 +10,7 @@ public class RabbitConsumer {
 
     private static final String QUEUE_NAME = "queue_demo";
 
-    private static final String IP_ADDRESS = "192.168.10.6";
+    private static final String IP_ADDRESS = "192.168.10.8";
 
     private static final Integer PORT = 5672;
 
@@ -24,7 +24,7 @@ public class RabbitConsumer {
         Connection connection = factory.newConnection(adresses);
         final Channel channel = connection.createChannel();
         channel.basicQos(64);
-        Consumer consumer = new DefaultConsumer(channel){
+        /*Consumer consumer = new DefaultConsumer(channel){
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 System.out.println("recv message "+ new String(body));
@@ -36,7 +36,18 @@ public class RabbitConsumer {
                 super.handleDelivery(consumerTag, envelope, properties, body);
             }
         };
-        channel.basicConsume(QUEUE_NAME,consumer);
+        channel.basicConsume(QUEUE_NAME,consumer);*/
+
+        channel.basicConsume(QUEUE_NAME, false,new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                System.out.println(Thread.currentThread().getName() + ":" + new String(body));
+                String routingKey =  envelope.getRoutingKey();
+                String contentType = properties.getContentType();
+                long deliveryTag = envelope.getDeliveryTag();
+                channel.basicAck(deliveryTag,true);
+            }
+        });
         // 等待回调函数执行完毕之后，关闭资源
         channel.close();
         connection.close();

@@ -19,10 +19,6 @@ public class RabbitProducer {
 
     private static final String QUEUE_NAME = "queue_demo";
 
-    private static final String IP_ADDRESS = "192.168.10.8";
-
-    private static final Integer PORT = 5672;
-
     public static void main(String[] args) throws IOException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException {
         ConnectionFactory factory = new ConnectionFactory();
         // 设置主机地址
@@ -40,7 +36,7 @@ public class RabbitProducer {
         // 创建信道
         Channel channel = connection.createChannel();
         // ConnectionFactory和Channel中都有该方法，但是不建议使用
-        Boolean flag = channel.isOpen();
+        // Boolean flag = channel.isOpen();
 
 
         // 申明一个交换器（如果mq已经存在一个相同名称的交换器，则直接返回这个交换器，否则创建成功后返回）
@@ -49,11 +45,11 @@ public class RabbitProducer {
         channel.queueDeclare(QUEUE_NAME,true,false,false,null);
         // 交换器与对列绑定
         channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,ROUTING_KEY);
-        String message = "Hello World";
+        String message = "Hello World.....";
         // 发送消息
-       //  channel.basicPublish(EXCHANGE_NAME,ROUTING_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,message.getBytes());
+        channel.basicPublish(EXCHANGE_NAME,ROUTING_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,message.getBytes());
         // 设置headers
-        Map<String,Object> headers = new HashMap<>();
+       /* Map<String,Object> headers = new HashMap<>();
         headers.put("location","here");
         headers.put("time","today");
         // 自定义消息属性
@@ -66,7 +62,7 @@ public class RabbitProducer {
                         // 设置过期时间
                         .expiration("60000")
                         .userId("hidden").build()
-                ,message.getBytes());
+                ,message.getBytes());*/
         channel.close();
         connection.close();
     }
